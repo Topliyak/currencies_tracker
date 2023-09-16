@@ -1,9 +1,9 @@
 from typing import Dict
 
-from binance import binance
-from garantex import garantex
+from .binance import binance
+from .garantex import garantex
 
-from exchange_service import (
+from .core.exchange_service import (
     ExchangeService,
     BestPriceSource,
     AveragePriceSource

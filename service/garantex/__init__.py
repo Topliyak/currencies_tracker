@@ -1,5 +1,5 @@
-from exchange_service import AveragePrice
-from exchange_service import (
+from service.core.exchange_service import AveragePrice
+from service.core.exchange_service import (
     ExchangeService,
     AveragePriceSource, AveragePrice
 )

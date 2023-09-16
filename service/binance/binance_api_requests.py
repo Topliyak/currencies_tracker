@@ -1,7 +1,7 @@
 import requests
 import json
 from typing import List, Iterable
-from exchange_service import BestPrice, AveragePrice
+from service.core.exchange_service import BestPrice, AveragePrice
 
 
 def get_markets_ids() -> List[str]:

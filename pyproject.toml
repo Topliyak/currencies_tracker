@@ -9,6 +9,7 @@ packages = [{include = "currancy_tracker"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 requests = "^2.31.0"
+flask = "^2.3.3"
 
 
 [build-system]

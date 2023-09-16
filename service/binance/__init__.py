@@ -1,4 +1,4 @@
-from exchange_service import (
+from service.core.exchange_service import (
     ExchangeService,
     BestPriceSource, BestPrice, 
     AveragePriceSource, AveragePrice
