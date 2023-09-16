@@ -1,86 +1,62 @@
-import requests
-import json
+from typing import Dict
 
-from typing import List
-from dataclasses import dataclass
+from binance import binance
+from garantex import garantex
 
-
-@dataclass
-class Market:
-    id: str
-    name: str
-    ask_unit: str
-    bid_unit: str
-    min_ask: str
-    min_bid: str
-    maker_fee: str
-    taker_fee: str
-    
-    
-@dataclass
-class Price:
-    price: str
-    volume: str
-    amount: str
-    factor: str
-    type: str
-    
-    
-@dataclass
-class Trade:
-    """
-        id
-        price - цена
-        volume - сумма в базовой валюте
-        funds - сумма в валюте котировки
-        market - id рынка
-        created_at - время сделки
-    """
-    
-    id: int
-    price: str
-    volume: str
-    funds: str 
-    market: str
-    created_at: str
+from exchange_service import (
+    ExchangeService,
+    BestPriceSource,
+    AveragePriceSource
+)
 
 
-def get_markets() -> List[Market]:
-    """ https://garantexio.github.io/?shell#47ff48632f """
-    
-    url = 'https://garantex.org/api/v2/markets'
-    
-    response = requests.get(url).text
-    markets = [Market(**mdick) for mdick in json.loads(response)]
-    
-    return markets
+names_and_exchange_services: Dict[str, ExchangeService] = {
+    'binance': binance,
+    'garantex': garantex
+}
 
 
-def get_trades(market_id: str) -> List[Trade]:
-    """ https://garantexio.github.io/?shell#f00f8079b3 """
+def _filter_exchange_services(interface: type = None, support_market_id: str = None):
+    snames = names_and_exchange_services.keys()
     
-    url = 'https://garantex.org/api/v2/trades'
-    
-    market_param = 'market'
-    timestamp_param = 'timestamp'
-    limit_param = 'limit'
-    
-    params = {
-        market_param: market_id,
-        limit_param: 10,
-    }
-    
-    response = requests.get(url, params)
-    
-    trades = [Trade(**tdict) for tdict in json.loads(response.text)]
-    
-    return trades
+    if interface is not None:
+        func = lambda name: isinstance(names_and_exchange_services[name], interface)
+        snames = filter(func, snames)
+        
+    if support_market_id is not None:
+        func = lambda name: names_and_exchange_services[name].support_market(support_market_id)
+        snames = filter(func, snames)
+        
+    return {name: names_and_exchange_services[name] for name in snames}
 
 
-if __name__ == '__main__':
-    markets = get_markets()
-    trades = {m.id: get_trades(m.id) for m in markets}
+def get_best_price(market_id):
+    names_and_best_price_sources: Dict[str, BestPriceSource]
     
-    for m_id, t in trades.items():
-        print(m_id, t)
-        print()
+    names_and_best_price_sources = _filter_exchange_services(
+        interface=BestPriceSource,
+        support_market_id=market_id
+    )
+            
+    res = {}
+    
+    for name, bp_source in names_and_best_price_sources.items():
+        res[name] = bp_source.get_best_price(market_id)
+        
+    return res
+
+
+def get_average_price(market_id):
+    names_and_avg_price_sources: Dict[str, AveragePriceSource]
+    
+    names_and_avg_price_sources = _filter_exchange_services(
+        interface=AveragePriceSource,
+        support_market_id=market_id
+    )
+            
+    res = {}
+    
+    for name, avgp_source in names_and_avg_price_sources.items():
+        res[name] = avgp_source.get_average_price(market_id)
+        
+    return res
