@@ -10,9 +10,12 @@ def get_markets_ids() -> List[str]:
     url = "https://api.binance.com/api/v3/exchangeInfo"
     
     response = requests.get(url)
+    response_dict = json.loads(response.text)
     
-    exchange_info = json.loads(response.text)
-    markets_ids = [s['symbol'] for s in exchange_info['symbols']]
+    if 'code' in response_dict:
+        raise ValueError(response_dict)
+    
+    markets_ids = [s['symbol'] for s in response_dict['symbols']]
     
     return markets_ids
 
