@@ -1,4 +1,9 @@
 from server.app import app
+from os import environ
 
 
-app.run(host='0.0.0.0', port=5000)
+host = environ.get('HOST') or 'localhost'
+port = environ.get('PORT') or 5000
+
+if environ.get('DONTRUN') is False:
+    app.run(host, port)
