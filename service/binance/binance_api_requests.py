@@ -27,13 +27,16 @@ def get_best_price(market_id: str) -> BestPrice:
     params = {market_param: market_id}
     
     response = requests.get(url, params=params)
+    response_dict = json.loads(response.text)
     
-    best_price_dict = json.loads(response.text)
+    if 'code' in response_dict:
+        raise ValueError(response_dict)
+    
     best_price = BestPrice(
-        ask_price=best_price_dict['askPrice'],
-        ask_qty=best_price_dict['askQty'],
-        bid_price=best_price_dict['bidPrice'],
-        bid_qty=best_price_dict['bidQty']
+        ask_price=response_dict['askPrice'],
+        ask_qty=response_dict['askQty'],
+        bid_price=response_dict['bidPrice'],
+        bid_qty=response_dict['bidQty']
     )
     
     return best_price
@@ -52,9 +55,12 @@ def get_best_prices(*markets_ids: Iterable[str]) -> List[BestPrice]:
     params = {markets_param: markets_value}
     
     response = requests.get(url, params=params)
+    response_dict = json.loads(response.text)
     
-    best_prices_dicts = json.loads(response.text)
-    best_prices = [BestPrice(**bp_dict) for bp_dict in best_prices_dicts]
+    if 'code' in response_dict:
+        raise ValueError(response_dict)
+    
+    best_prices = [BestPrice(**bp_dict) for bp_dict in response_dict]
     
     return best_prices
 
@@ -69,8 +75,11 @@ def get_average_price(market_id: str) -> AveragePrice:
     params = {market_param: market_id}
     
     response = requests.get(url, params=params)
+    response_dict = json.loads(response.text)
     
-    avg_price_dict = json.loads(response.text)
-    avg_price = AveragePrice(**avg_price_dict)
+    if 'code' in response_dict:
+        raise ValueError(response_dict)
+    
+    avg_price = AveragePrice(**response_dict)
     
     return avg_price

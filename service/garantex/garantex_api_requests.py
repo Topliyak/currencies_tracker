@@ -42,8 +42,13 @@ def get_markets() -> List[Market]:
     
     url = 'https://garantex.org/api/v2/markets'
     
-    response = requests.get(url).text
-    markets = [Market(**mdict) for mdict in json.loads(response)]
+    response = requests.get(url)
+    response_dict = json.loads(response.text)
+    
+    if 'code' in response_dict:
+        raise ValueError(response_dict)
+    
+    markets = [Market(**mdict) for mdict in response_dict]
     
     return markets
 
@@ -62,10 +67,15 @@ def get_trades(market_id: str, count: int) -> List[Trade]:
     }
     
     response = requests.get(url, params)
+    response_dict = json.loads(response.text)
+    
+    if 'code' in response_dict:
+        raise ValueError(response_dict)
+    
     
     trades = []
     
-    for tdict in json.loads(response.text):
+    for tdict in response_dict:
         trades.append(Trade(
             id=tdict['id'],
             price=tdict['price'],
