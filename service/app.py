@@ -11,7 +11,7 @@ from .core.exchange_service import (
 
 
 names_and_exchange_services: Dict[str, ExchangeService] = {
-    'binance': binance,
+    # 'binance': binance,
     'garantex': garantex
 }
 
