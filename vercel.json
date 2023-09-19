@@ -4,14 +4,14 @@
     "installCommand": "pip install poetry | poetry install",
     "builds": [
         {
-            "src": "./main.py",
+            "src": "server/app.py",
             "use": "@vercel/python"
         }
     ],
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "./main.py"
+            "dest": "server/app.py"
         }
     ]
 }
