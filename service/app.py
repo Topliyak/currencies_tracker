@@ -10,6 +10,8 @@ from .core.exchange_service import (
 )
 
 
+SKIP_EXCHANGE_SERVICE_IF_RAISE_ERROR = True
+
 names_and_exchange_services: Dict[str, ExchangeService] = {
     'binance': binance,
     'garantex': garantex
@@ -41,7 +43,11 @@ def get_best_price(market_id):
     res = {}
     
     for name, bp_source in names_and_best_price_sources.items():
-        res[name] = bp_source.get_best_price(market_id)
+        try:
+            res[name] = bp_source.get_best_price(market_id)
+        except Exception as e:
+            if SKIP_EXCHANGE_SERVICE_IF_RAISE_ERROR is False:
+                raise e
         
     return res
 
@@ -57,6 +63,10 @@ def get_average_price(market_id):
     res = {}
     
     for name, avgp_source in names_and_avg_price_sources.items():
-        res[name] = avgp_source.get_average_price(market_id)
+        try:
+            res[name] = avgp_source.get_average_price(market_id)
+        except Exception as e:
+            if SKIP_EXCHANGE_SERVICE_IF_RAISE_ERROR is False:
+                raise e
         
     return res

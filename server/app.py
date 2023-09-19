@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, Response
 
 from service.app import (
 	get_best_price,
@@ -23,6 +23,9 @@ def best_price():
     market_id = request.args.get('market_id')
     best_price = get_best_price(market_id)
     
+    if len(best_price) == 0:
+        return Response('There are not exchange services that responded', status=204)
+    
     return best_price
 
 
@@ -30,5 +33,8 @@ def best_price():
 def average_price():
     market_id = request.args.get('market_id')
     average_price = get_average_price(market_id)
+    
+    if len(average_price) == 0:
+        return Response('There are not exchange services that responded', status=204)
     
     return average_price
