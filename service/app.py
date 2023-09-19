@@ -26,8 +26,12 @@ def _filter_exchange_services(interface: type = None, support_market_id: str = N
         snames = filter(func, snames)
         
     if support_market_id is not None:
-        func = lambda name: names_and_exchange_services[name].support_market(support_market_id)
-        snames = filter(func, snames)
+        try:
+            func = lambda name: names_and_exchange_services[name].support_market(support_market_id)
+            snames = filter(func, snames)
+        except Exception as e:
+            if SKIP_EXCHANGE_SERVICE_IF_RAISE_ERROR is False:
+                raise e
         
     return {name: names_and_exchange_services[name] for name in snames}
 
