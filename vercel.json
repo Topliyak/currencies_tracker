@@ -1,6 +1,7 @@
 {
     "version": 2,
-    "framework": "Flask",
+    "framework": "flask",
+    "installCommand": "pip install poetry | poetry install",
     "builds": [
         {
             "src": "./main.py",
