@@ -1,16 +1,15 @@
 {
     "version": 2,
-    "installCommand": "pip install poetry | poetry install",
     "builds": [
         {
-            "src": "server/app.py",
+            "src": "/main.py",
             "use": "@vercel/python"
         }
     ],
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "server/app.py"
+            "dest": "/main.py"
         }
     ]
 }
