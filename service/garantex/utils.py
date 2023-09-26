@@ -14,5 +14,6 @@ def get_average_price_from_trades(trades: List[Trade]) -> AveragePrice:
     str_prices = map(lambda t: t.price, trades)
     prices = map(Decimal, str_prices)
     avg = sum(prices) / len(trades)
+    avg_str = str(avg)
     
-    return AveragePrice(mins, avg)
+    return AveragePrice(mins, avg_str)

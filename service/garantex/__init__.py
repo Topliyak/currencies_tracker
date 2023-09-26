@@ -11,8 +11,6 @@ from .garantex_api_requests import (
 
 from .utils import get_average_price_from_trades
 
-from decimal import Decimal
-
 
 class Garantex(ExchangeService, 
                AveragePriceSource):

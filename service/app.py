@@ -5,8 +5,8 @@ from .garantex import garantex
 
 from .core.exchange_service import (
     ExchangeService,
-    BestPriceSource,
-    AveragePriceSource
+    BestPriceSource, BestPrice,
+    AveragePriceSource, AveragePrice,
 )
 
 
@@ -36,14 +36,14 @@ def _filter_exchange_services(interface: type = None, support_market_id: str = N
     return {name: names_and_exchange_services[name] for name in snames}
 
 
-def get_best_price(market_id):
+def get_best_price(market_id) -> Dict[str, BestPrice]:
     names_and_best_price_sources: Dict[str, BestPriceSource]
     
     names_and_best_price_sources = _filter_exchange_services(
         interface=BestPriceSource,
         support_market_id=market_id
     )
-            
+
     res = {}
     
     for name, bp_source in names_and_best_price_sources.items():
@@ -56,7 +56,7 @@ def get_best_price(market_id):
     return res
 
 
-def get_average_price(market_id):
+def get_average_price(market_id) -> Dict[str, AveragePrice]:
     names_and_avg_price_sources: Dict[str, AveragePriceSource]
     
     names_and_avg_price_sources = _filter_exchange_services(
