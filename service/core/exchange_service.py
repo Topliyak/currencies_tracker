@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Set
     
     
 @dataclass
@@ -30,6 +31,10 @@ class AveragePriceSource(ABC):
    
 class ExchangeService(ABC):
     @abstractmethod
-    def support_market(self, market_id: str) -> bool:
+    def support_market(self, market_id: str, use_cached: bool = True) -> bool:
+        pass
+
+    @abstractmethod
+    def get_markets(self, use_cached: bool = True) -> Set[str]:
         pass
     

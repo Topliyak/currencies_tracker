@@ -1,11 +1,13 @@
 from flask import Flask, request, Response
+from .utils.different_formats import convert_to_format
+from typing import Dict
 
 from service.app import (
 	get_best_price,
-	get_average_price
+	get_average_price,
+    get_markets,
+    get_exchange_services,
 )
-
-from .utils.different_formats import convert_to_format
 
 
 app = Flask(__name__)
@@ -17,7 +19,38 @@ def home():
                 <a href="best_price?market_id=LTCBTC">best prices</a>
                 <hr>
                 <a href="average_price?market_id=USDTRUB">average prices</a>
+                <hr>
+                <a href="markets">markets</a>
+                <hr>
+                <a href="exchange_services">exchange_services</a>
     """
+
+
+@app.route('/exchange_services', methods=['GET'])
+def exchange_services():
+    services = get_exchange_services()
+
+    format = request.args.get('format') or 'json'
+    response = convert_to_format(services, format)
+
+    return response
+
+
+@app.route('/markets', methods=['GET'])
+def markets():
+    services_arg = request.args.get('services')
+    markets: Dict
+
+    if services_arg is not None:
+        services = services_arg.split(',')
+        markets = get_markets(services)
+    else:
+        markets = get_markets()
+
+    format = request.args.get('format') or 'json'
+    response = convert_to_format(markets, format)
+
+    return response
 
 
 @app.route('/best_price', methods=['GET'])

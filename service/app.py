@@ -1,4 +1,5 @@
-from typing import Dict
+from typing import Dict, List
+from functools import reduce
 
 from .binance import binance
 from .garantex import garantex
@@ -74,3 +75,36 @@ def get_average_price(market_id) -> Dict[str, AveragePrice]:
                 raise e
         
     return res
+
+
+def get_markets(services_names = None):
+    markets: Dict[str, List[str]] = {}
+
+    services_names = services_names or names_and_exchange_services.keys()
+
+    for service_name in services_names:
+        if service_name not in names_and_exchange_services:
+            raise ValueError(f'Service {service_name} is not supported')
+        
+        service = names_and_exchange_services[service_name]
+        
+        new_markets = []
+        
+        try:
+            new_markets = service.get_markets()
+        except Exception as e:
+            if SKIP_EXCHANGE_SERVICE_IF_RAISE_ERROR is False:
+                raise e
+
+        for new_market in new_markets:
+            if new_market in markets:
+                markets[new_market].append(service_name)
+                continue
+
+            markets[new_market] = [service_name]
+
+    return markets
+
+
+def get_exchange_services():
+    return list(names_and_exchange_services.keys())
