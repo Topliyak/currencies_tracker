@@ -1,7 +1,7 @@
 from flask import Response
 
-from json import dumps
-from dicttoxml import dicttoxml
+import json
+from . import xml_builder
 
 from typing import Dict, Callable, Any, Set
 
@@ -24,17 +24,12 @@ def convert_to_format(struct, format: str) -> Response:
 
 
 def to_json(struct) -> str:
-    return dumps(struct)
+    return json.dumps(struct)
 
 
 def to_xml(struct) -> str:
     converted: str
-    
-    converted = dicttoxml(
-        struct, 
-        attr_type=False, 
-        return_bytes=False
-    )
+    converted = xml_builder.dumps(struct)
 
     return converted
 
