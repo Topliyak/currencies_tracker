@@ -30,8 +30,8 @@ class Trade:
     """
     
     id:         int
-    price:      str
-    volume:     str
+    price:      str | None
+    volume:     str | None
     funds:      str 
     market:     str
     created_at: datetime
@@ -72,8 +72,7 @@ def get_trades(market_id: str, count: int) -> List[Trade]:
     if 'code' in response_dict:
         raise ValueError(response_dict)
     
-    
-    trades = []
+    trades: List[Trade] = []
     
     for tdict in response_dict:
         trades.append(Trade(

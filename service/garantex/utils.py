@@ -11,9 +11,18 @@ def get_average_price_from_trades(trades: List[Trade]) -> AveragePrice:
     mins = (last_moment - first_moment).total_seconds() // 60
     mins = round(mins)
     
-    str_prices = map(lambda t: t.price, trades)
-    prices = map(Decimal, str_prices)
-    avg = sum(prices) / len(trades)
+    prices = []
+
+    for trade in trades:
+        if trade.price is None:
+            break
+
+        prices.append(Decimal(trade.price))
+
+    if len(prices) == 0:
+        raise ValueError('No data for calculate actual average price')
+    
+    avg = sum(prices) / len(prices)
     avg_str = str(avg)
     
     return AveragePrice(mins, avg_str)
