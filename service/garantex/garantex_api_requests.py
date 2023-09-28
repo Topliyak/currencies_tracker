@@ -2,7 +2,7 @@ import requests
 import json
 from datetime import datetime
 
-from typing import List
+from typing import List, Optional
 from dataclasses import dataclass
 
 
@@ -30,8 +30,8 @@ class Trade:
     """
     
     id:         int
-    price:      str | None
-    volume:     str | None
+    price:      Optional[str]
+    volume:     Optional[str]
     funds:      str 
     market:     str
     created_at: datetime
