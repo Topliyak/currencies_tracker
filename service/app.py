@@ -1,13 +1,14 @@
-from typing import Dict, List
-from functools import reduce
+from typing import Dict, List, Optional, Iterable
 
 from .binance import binance
 from .garantex import garantex
+from .apilayer import apilayer
 
 from .core.exchange_service import (
     ExchangeService,
     BestPriceSource, BestPrice,
     AveragePriceSource, AveragePrice,
+    LiveRateSource, PairRate,
 )
 
 
@@ -15,7 +16,8 @@ SKIP_EXCHANGE_SERVICE_IF_RAISE_ERROR = True
 
 names_and_exchange_services: Dict[str, ExchangeService] = {
     'binance': binance,
-    'garantex': garantex
+    'garantex': garantex,
+    'apilayer': apilayer,
 }
 
 
@@ -78,33 +80,59 @@ def get_average_price(market_id) -> Dict[str, AveragePrice]:
 
 
 def get_markets(services_names = None):
-    markets: Dict[str, List[str]] = {}
+    markets: Dict[str, Iterable[str]] = {}
 
     services_names = services_names or names_and_exchange_services.keys()
 
     for service_name in services_names:
-        if service_name not in names_and_exchange_services:
-            raise ValueError(f'Service {service_name} is not supported')
-        
         service = names_and_exchange_services[service_name]
         
-        new_markets = []
-        
         try:
-            new_markets = service.get_markets()
+            markets[service_name] = service.get_markets()
         except Exception as e:
             if SKIP_EXCHANGE_SERVICE_IF_RAISE_ERROR is False:
                 raise e
-
-        for new_market in new_markets:
-            if new_market in markets:
-                markets[new_market].append(service_name)
-                continue
-
-            markets[new_market] = [service_name]
 
     return markets
 
 
 def get_exchange_services():
     return list(names_and_exchange_services.keys())
+
+
+def get_live_rates(source: str):
+    names_and_live_rate_sources: Dict[str, LiveRateSource]
+    
+    names_and_live_rate_sources = _filter_exchange_services(
+        interface=LiveRateSource,
+    )
+
+    res: Dict[str, List[PairRate]] = {}
+
+    for serv_name, service in names_and_live_rate_sources.items():
+        try:
+            res[serv_name] = service.get_lives(source_id=source)                
+        except Exception as e:
+            if SKIP_EXCHANGE_SERVICE_IF_RAISE_ERROR is False:
+                raise e
+
+    return res
+
+
+def get_live_rate(market: str):
+    names_and_live_rate_sources: Dict[str, LiveRateSource]
+    
+    names_and_live_rate_sources = _filter_exchange_services(
+        interface=LiveRateSource,
+    )
+
+    res: Dict[str, PairRate] = {}
+
+    for serv_name, service in names_and_live_rate_sources.items():
+        try:
+            res[serv_name] = service.get_live(market_id=market)                
+        except Exception as e:
+            if SKIP_EXCHANGE_SERVICE_IF_RAISE_ERROR is False:
+                raise e
+
+    return res

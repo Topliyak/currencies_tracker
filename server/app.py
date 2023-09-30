@@ -7,6 +7,8 @@ from service.app import (
 	get_average_price,
     get_markets,
     get_exchange_services,
+    get_live_rates,
+    get_live_rate,
 )
 
 
@@ -16,13 +18,17 @@ app = Flask(__name__)
 @app.route('/', methods=['GET'])
 def home():
     return """
-                <a href="best_price?market_id=LTCBTC">best prices</a>
+                <a href="best_price?market_id=LTCBTC">best prices for LTCBTC</a>
                 <hr>
-                <a href="average_price?market_id=USDTRUB">average prices</a>
+                <a href="average_price?market_id=USDTRUB">average prices for USDTRUB</a>
                 <hr>
                 <a href="markets">markets</a>
                 <hr>
                 <a href="exchange_services">exchange_services</a>
+                <hr>
+                <a href="lives?source=USD">live_rates for USD</a>
+                <hr>
+                <a href="live?market=USDRUB">live_rate for USDRUB</a>
     """
 
 
@@ -78,4 +84,28 @@ def average_price():
     format = request.args.get('format') or 'json'
     response = convert_to_format(average_price, format)
     
+    return response
+
+
+@app.route('/lives', methods=['GET'])
+def live_rates():
+    source = request.args['source']
+    rates = get_live_rates(source)
+    rates = {serv: [r.__dict__ for r in rates] for serv, rates in rates.items()}
+
+    format = request.args.get('format') or 'json'
+    response = convert_to_format(rates, format)
+
+    return response
+
+
+@app.route('/live', methods=['GET'])
+def live_rate():
+    market = request.args['market']
+    rates = get_live_rate(market)
+    rates = {serv: rate.__dict__ for serv, rate in rates.items()}
+
+    format = request.args.get('format') or 'json'
+    response = convert_to_format(rates, format)
+
     return response
