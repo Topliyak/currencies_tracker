@@ -11,14 +11,8 @@ def get_average_price_from_trades(trades: List[Trade]) -> AveragePrice:
     mins = (last_moment - first_moment).total_seconds() // 60
     mins = round(mins)
     
-    prices = []
-
-    for trade in trades:
-        if trade.price is None:
-            break
-
-        prices.append(Decimal(trade.price))
-
+    prices = [Decimal(t.price) for t in trades if t.price is not None]
+    
     if len(prices) == 0:
         raise ValueError('No data for calculate actual average price')
     
