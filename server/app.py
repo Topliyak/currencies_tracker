@@ -53,6 +53,8 @@ def markets():
     else:
         markets = get_markets()
 
+    markets = {serv: list(serv_markets) for serv, serv_markets in markets.items()}
+
     format = request.args.get('format') or 'json'
     response = convert_to_format(markets, format)
 
